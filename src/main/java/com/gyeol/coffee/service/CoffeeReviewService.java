@@ -105,12 +105,14 @@ public class CoffeeReviewService {
 
     /**
      * 커피 원두 유사도 기반 추천
-     * @param req 커피 지역, 나무, 로스팅레벨 데이터
+     * @param growing_region 커피 지역 데이터
+     * @param tree_variety 커피 나무(품종) 데이터
+     * @param roast_level 로스팅레벨 데이터
      * @return GetSimilarityRecommendationResponse
      * @throws JsonProcessingException 예외 처리
      * @throws IOException 예외 처리
      */
-    public GetSimilarityRecommendationResponse getSimilarityRecommendation(GetSimilarityRecommendationRequest req)
+    public GetSimilarityRecommendationResponse getSimilarityRecommendation(String growing_region, String tree_variety, String roast_level)
             throws JsonProcessingException, IOException {
         log.info("[getSimilarityRecommendation]");
 
@@ -126,9 +128,9 @@ public class CoffeeReviewService {
             // Spring -> Flask JSON 전달
             BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(start_con.getOutputStream()));
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("growing_region", req.getGrowing_region());
-            jsonObject.put("tree_variety", req.getTree_variety());
-            jsonObject.put("roast_level", req.getRoast_level());
+            jsonObject.put("growing_region", growing_region);
+            jsonObject.put("tree_variety", tree_variety);
+            jsonObject.put("roast_level", roast_level);
             wr.write(jsonObject.toString());
             wr.flush();
             wr.close();
