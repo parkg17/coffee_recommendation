@@ -1,0 +1,574 @@
+<template>
+    <div class="item">
+      <h1>항목별 추천</h1>
+    </div>
+
+
+    <select v-model="condition1">
+        <option
+          v-for="(item, index) in selectList"
+          :key="index"
+          :value="item.value"
+          >{{ item.name }}</option
+        >
+    </select>
+
+    <select v-model="condition2">
+        <option
+          v-for="(item, index) in selectList"
+          :key="index"
+          :value="item.value"
+          >{{ item.name }}</option
+        >
+    </select>
+
+    <select v-model="condition3">
+        <option
+          v-for="(item, index) in selectList"
+          :key="index"
+          :value="item.value"
+          >{{ item.name }}</option
+        >
+    </select>
+
+
+    <br>
+    <button v-on:click="getCoffee">추천받기</button>
+    <br>
+    <span>선택 value: {{ condition1 }}</span>
+    <br>
+    <span>선택 value: {{ condition2 }}</span>
+    <br>
+    <span>선택 value: {{ condition3 }}</span>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>index</th>
+            <th>growing_region</th>
+            <th>tree_variety</th>
+            <th>roast_level</th>
+            <th>agtron</th>
+            <th>aroma</th>
+            <th>acidity</th>
+            <th>body</th>
+            <th>flavor</th>
+            <th>aftertaste</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr :key="i" v-for="(result, i) in result">
+            <th>{{result.index}}</th>
+            <th>{{result.growing_region}}</th>
+            <th>{{result.tree_variety}}</th>
+            <th>{{result.roast_level}}</th>
+            <th>{{result.agtron}}</th>
+            <th>{{result.aroma}}</th>
+            <th>{{result.acidity}}</th>
+            <th>{{result.body}}</th>
+            <th>{{result.flavor}}</th>
+            <th>{{result.aftertaste}}</th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    
+
+    <div style="margin:0 auto; text-align=center" :key="i" v-for="(result, i) in result">
+        <a-layout style="width:50%; display: flex; justify-content: center;">
+            <a-layout-sider
+                breakpoint="lg"
+                collapsed-width="0"
+                @collapse="onCollapse"
+                @breakpoint="onBreakpoint">
+            <div class="logo" />
+
+            <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
+                <a-sub-menu key="sub1">
+                    <template #title>
+                      <span>
+                        <user-outlined />
+                        커피 지역
+                      </span>
+                    </template>
+                    <a-menu-item key="1">
+                        <user-outlined />
+                        <span class="nav-text">{{result.growing_region}}</span>
+                        </a-menu-item>
+                </a-sub-menu>
+                <a-menu-item key="1">
+                <user-outlined />
+                <span class="nav-text">{{result.growing_region}}</span>
+                </a-menu-item>
+                <a-menu-item key="2">
+                <video-camera-outlined />
+                <span class="nav-text">{{result.tree_variety}}</span>
+                </a-menu-item>
+                <a-menu-item key="3">
+                <upload-outlined />
+                <span class="nav-text">{{result.roast_level}}</span>
+                </a-menu-item>
+                <a-menu-item key="4">
+                <user-outlined />
+                <span class="nav-text">nav 4</span>
+                </a-menu-item>
+            </a-menu>
+            </a-layout-sider>
+            <a-layout>
+            <a-layout-header :style="{ background: '#fff', padding: 0 }" />
+            <a-layout-content :style="{ margin: '24px 16px 0' }">
+                <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
+                    <Radar 
+                    :data="chartData" 
+                    :options="chartOptions"/>
+                </div>
+            </a-layout-content>
+            <a-layout-footer style="text-align: center">
+                Ant Design ©2018 Created by Ant UED
+            </a-layout-footer>
+            </a-layout>
+        </a-layout>
+        <br>
+    </div>
+
+    <div :key="i" v-for="(result, i) in result">
+    <a-layout>
+        <a-layout style="width:300px">
+          <a-layout-content>{{result.growing_region}}</a-layout-content>
+          <a-layout-content>{{result.tree_variety}}</a-layout-content>
+          <a-layout-content>{{result.roast_level}}</a-layout-content>
+        </a-layout>
+
+        <a-layout-sider>Sider</a-layout-sider>
+
+
+        <a-layout>
+          <a-layout-content>Content</a-layout-content>
+          <Radar 
+          :data="chartData" 
+          :options="chartOptions"/>
+            
+        </a-layout>
+      </a-layout>
+    </div>
+
+    <!--
+    <div :key="i" v-for="(result, i) in result" >
+
+        <Radar 
+        :data="chartData" 
+        :options="chartOptions"
+    />
+    </div>
+    <div :key="i" v-for="(result, i) in result" >
+        <div>{{changeDataset(0)}}</div>
+        <Bar
+        :options="chartOptions"
+        :data="chartData"/>
+        <div>{{changeasd(i)}}</div>
+    </div>
+
+    -->
+
+  </template>
+  
+
+<script>
+import { Radar } from 'vue-chartjs'
+import { Chart, registerables } from 'chart.js'
+
+Chart.register(...registerables)
+
+
+export default {
+    name: 'RadarChart',
+    components: { Radar},
+    data() {
+        return {
+            chartData: {
+            labels: [ 'aroma', 'acidity', 'body', 'flavor', 'aftertaste' ],
+            datasets: [{ 
+                label: 'average',
+                data: [5, 5, 5, 5, 5],
+                fill: true,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                pointBackgroundColor: 'rgb(255, 99, 132)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(255, 99, 132)'
+                }, {
+                label: 'bean',
+                data: [8, 9, 8, 9, 8],
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgb(54, 162, 235)',
+                pointBackgroundColor: 'rgb(54, 162, 235)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(54, 162, 235)'
+                }]
+            },
+            chartOptions: {
+                responsive: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: false
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    }
+                },
+                chart: {
+                    height: 350,
+                    type: 'radar',
+                    dropShadow: {
+                        enabled: true,
+                        blur: 1,
+                        left: 1,
+                        top: 1
+                    }
+                },
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                stroke: {
+                    width: 2
+                },
+                fill: {
+                    opacity: 0.1
+                },
+                markers: {
+                    size: 0
+                }
+            },
+            condition1: "aroma",
+            condition2: "aroma",
+            condition3: "aroma",
+            selectList: [
+                { name: "선택해주세요.", value: "" },
+                { name: "향미", value: "aroma" },
+                { name: "산미", value: "acidity" },
+                { name: "바디감", value: "body" },
+                { name: "맛(풍미)", value: "flavor" },
+                { name: "뒷맛", value: "aftertaste" },
+            ],
+            result: [],
+            new_arr: []
+        };
+    },
+    methods: { 
+        changeasd(i) {
+            console.log(this.chartData.datasets, i);
+            return "hi";
+        },
+        changeDataset(i) {
+            this.new_arr = []
+            this.new_arr.push(this.result[i].aroma);
+            this.new_arr.push(this.result[i].acidity);
+            this.new_arr.push(this.result[i].body);
+            this.new_arr.push(this.result[i].flavor);
+            this.new_arr.push(this.result[i].aftertaste);
+            this.chartData.datasets.data = this.new_arr
+            //console.log(this.chartData.datasets.data);
+            return this.result[i].growing_region;
+        },
+        async getCoffee() {
+            console.log(this.chartData);
+            this.$axios.get('http://127.0.0.1:8080/item', {
+                params: {
+                    rc: 200,
+                    condition1: this.condition1,
+                    condition2: this.condition2,
+                    condition3: this.condition3
+                },
+            }).then(response => {
+                //console.log('### response: ' + JSON.stringify(response))
+                this.result = response.data.result
+            }).catch(error => {
+                console.log(error)
+            })
+        }
+  }
+};
+</script>
+
+<style>
+#components-layout-demo-basic .code-box-demo {
+  text-align: center;
+}
+#components-layout-demo-basic .ant-layout-header,
+#components-layout-demo-basic .ant-layout-footer {
+  color: #fff;
+  background: #7dbcea;
+}
+[data-theme='dark'] #components-layout-demo-basic .ant-layout-header {
+  background: #6aa0c7;
+}
+[data-theme='dark'] #components-layout-demo-basic .ant-layout-footer {
+  background: #6aa0c7;
+}
+#components-layout-demo-basic .ant-layout-footer {
+  line-height: 1.5;
+}
+#components-layout-demo-basic .ant-layout-sider {
+  color: #fff;
+  line-height: 120px;
+  background: #3ba0e9;
+}
+[data-theme='dark'] #components-layout-demo-basic .ant-layout-sider {
+  background: #3499ec;
+}
+#components-layout-demo-basic .ant-layout-content {
+  min-height: 120px;
+  color: #fff;
+  line-height: 120px;
+  background: rgba(16, 142, 233, 1);
+}
+[data-theme='dark'] #components-layout-demo-basic .ant-layout-content {
+  background: #107bcb;
+}
+#components-layout-demo-basic > .code-box-demo > .ant-layout + .ant-layout {
+  margin-top: 48px;
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="width:50" :key="i" v-for="(result, i) in result">
+    <a-layout>
+        <a-layout>
+          <a-layout-content>{{result.growing_region}}
+            <br>
+            {{result.tree_variety}}
+            <br>
+            {{result.roast_level}}
+          </a-layout-content>
+
+        </a-layout>
+
+        <a-layout-sider>Sider</a-layout-sider>
+
+
+        <a-layout>
+          <a-layout-content>Content</a-layout-content>
+          <Radar 
+          :data="chartData" 
+          :options="chartOptions"/>
+            
+        </a-layout>
+      </a-layout>
+    </div>
+</div>
+
+
+
+
+
+<div style="margin: auto; text-align=center" :key="i" v-for="(result, i) in result">
+    <a-layout style="width:50%; display: flex; justify-content: center; margin: auto;">
+        <a-layout-sider
+            breakpoint="lg"
+            collapsed-width="0">
+        <div class="logo" />
+
+        <a-menu theme="dark" mode="inline">
+            <a-menu-item key="sub12"> </a-menu-item>
+            <a-menu-item key="sub13"> </a-menu-item>
+            <a-sub-menu key="sub1">
+                <template #title>
+                <span>
+                    커피 지역
+                </span>
+                </template>
+            </a-sub-menu>
+            <a-menu-item style="text-align: center" key="1">
+            <span class="nav-text">{{result.growing_region}}</span>
+            </a-menu-item>
+            <a-sub-menu key="sub2">
+                <template #title>
+                <span>
+                    커피 나무
+                </span>
+                </template>
+            </a-sub-menu>
+            <a-menu-item style="text-align: center" key="2">
+            <span class="nav-text">{{result.tree_variety}}</span>
+            </a-menu-item>
+            <a-sub-menu key="sub3">
+                <template #title>
+                <span>
+                    로스팅 레벨
+                </span>
+                </template>
+            </a-sub-menu>
+            <a-menu-item style="text-align: center" key="3">
+            <span class="nav-text">{{result.roast_level}}</span>
+            </a-menu-item>
+        </a-menu>
+        </a-layout-sider>
+        <a-layout>
+        <a-layout-header :style="{ background: '#fff', padding: 0 }" >
+            {{result.growing_region.replace("region_", "")}}에서 자란 {{result.tree_variety.replace("tree_variety_", "")}} 커피 나무 원두
+        </a-layout-header>
+        <a-layout-content :style="{ margin: '24px 16px 0' }">
+            <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
+                <Radar id={{i}}
+                :data= changeCharDataset(i)
+                :options="chartOptions"/>
+            </div>
+        </a-layout-content>
+        <a-layout-footer style="text-align: center">
+            {{i + 1}}번째 커피 원두 추천
+        </a-layout-footer>
+        </a-layout>
+    </a-layout>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const BarChart = {
+    components: { Bar },
+    data() {
+        return {
+            BarDatass: {
+                labels: [ 'before', 'after'],
+                datasets: { 
+                    data: [7, 8],
+                    label: "",
+                    backgroundColor: "pink",
+                    pointBackgroundColor: "white",
+                    borderWidth: 0,
+                    fill: true,
+                    tension: 0.1,
+                    barPercentage: 0.7,
+                }
+            },
+            BarOptionss: {
+                indexAxis: "y",
+                plugins: {
+                    legend: {
+                    display: false
+                    },
+                    datalabels: {
+                    display: false
+                    },
+                    tooltip: {
+                    boxWidth: 15
+                    }
+                },
+                
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 5000
+                }
+            }
+        };
+    },
+};
+
+
+
+
+
+
+
+
+
+<div>
+    <Bar
+    :data= barData
+    :options="BarOptions" />
+</div>
+
+
+
+
+
+growing_region: "",
+tree_variety:"",
+roast_level:"",
+selectList_growingRegion: [
+{ name: "선택해주세요.", value: "" },
+{ name: "아프리카/아라비아", value: "region_africa_arabia" },
+{ name: "아시아/태평양", value: "region_asia_pacific" },
+{ name: "카리브해", value: "region_caribbean" },
+{ name: "중앙아메리카", value: "region_central_america" },
+{ name: "하와이", value: "region_hawaii" },
+{ name: "남미", value: "region_south_america" }
+],
+selectList_treeVariety: [
+    { name: "선택해주세요.", value: "" },
+    { name: "버번 커피", value: "tree_variety_bourbon" },
+    { name: "카투아이", value: "tree_variety_catuai" },
+    { name: "카투라", value: "tree_variety_caturra" },
+    { name: "게이샤", value: "tree_variety_geisha" },
+    { name: "마라카투라", value: "tree_variety_maracaturra" },
+    { name: "마라고지페", value: "tree_variety_maragogipe" },
+    { name: "모카", value: "tree_variety_mocca-moka" },
+    { name: "파카마라", value: "tree_variety_pacamara" },
+    { name: "로부스타", value: "tree_variety_robusta" },
+    { name: "케냐 품종", value: "tree_variety_sl-28-sl-34" },
+    { name: "티피카", value: "tree_variety_typica" }
+],
+selectList_roastLevel: [
+    { name: "선택해주세요.", value: "" },
+    { name: "Light", value: "Light" },
+    { name: "Medium-Dark", value: "Medium-Dark" },
+    { name: "Medium", value: "Medium" },
+    { name: "Medium-Light", value: "Medium-Light" },
+    { name: "Dark", value: "Dark" },
+    { name: "Very Dark", value: "Very Dark" }
+],  
